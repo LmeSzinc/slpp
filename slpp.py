@@ -12,13 +12,14 @@ ERRORS = {
     'mfnumber_sci': u'Malformed number (bad scientific format).',
 }
 
+
 def sequential(lst):
     length = len(lst)
     if length == 0 or lst[0] != 0:
         return False
     for i in range(length):
         if i + 1 < length:
-            if lst[i] + 1 != lst[i+1]:
+            if lst[i] + 1 != lst[i + 1]:
                 return False
     return True
 
@@ -77,9 +78,9 @@ class SLPP(object):
         elif isinstance(obj, (list, tuple, dict)):
             self.depth += 1
             if len(obj) == 0 or (not isinstance(obj, dict) and len([
-                    x for x in obj
-                    if isinstance(x, Number) or (isinstance(x, six.string_types) and len(x) < 10)
-               ]) == len(obj)):
+                x for x in obj
+                if isinstance(x, Number) or (isinstance(x, six.string_types) and len(x) < 10)
+            ]) == len(obj)):
                 newline = tab = ''
             dp = tab * self.depth
             s += "%s{%s" % (tab * (self.depth - 2), newline)
@@ -117,7 +118,7 @@ class SLPP(object):
             return self.object()
         if self.ch == "[":
             self.next_chr()
-        if self.ch in ['"',  "'",  '[']:
+        if self.ch in ['"', "'", '[']:
             return self.string(self.ch)
         if self.ch.isdigit() or self.ch == '-':
             return self.number()
@@ -128,7 +129,7 @@ class SLPP(object):
         start = self.ch
         if end == '[':
             end = ']'
-        if start in ['"',  "'",  '[']:
+        if start in ['"', "'", '[']:
             while self.next_chr():
                 if self.ch == end:
                     self.next_chr()
@@ -145,7 +146,6 @@ class SLPP(object):
         o = {}
         k = None
         idx = 0
-        numeric_keys = False
         self.depth += 1
         self.next_chr()
         self.white()
@@ -165,7 +165,7 @@ class SLPP(object):
                     self.next_chr()
                     if k is not None:
                         o[idx] = k
-                    if len([key for key in o if isinstance(key, six.string_types + (float,  bool, tuple))]) == 0:
+                    if len([key for key in o if isinstance(key, six.string_types + (int, float, bool, tuple))]) == 0:
                         so = sorted([key for key in o])
                         if sequential(so):
                             ar = []
@@ -195,6 +195,7 @@ class SLPP(object):
         raise ParseError(ERRORS['unexp_end_table'])  # Bad exit here
 
     words = {'true': True, 'false': False, 'nil': None}
+
     def word(self):
         s = ''
         if self.ch != '\n':
@@ -212,6 +213,7 @@ class SLPP(object):
             if not self.ch or not self.ch.isdigit():
                 raise ParseError(err)
             return n
+
         n = ''
         try:
             if self.ch == '-':
